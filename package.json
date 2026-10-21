@@ -1,0 +1,33 @@
+{
+  "name": "shixu-independent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/prepare-flower-themes.mjs && node scripts/prepare-music.mjs && vite build",
+    "start": "node server/index.mjs",
+    "check": "tsc --noEmit",
+    "desktop:prepare": "npm run check && npm run build && node desktop/build.mjs",
+    "desktop:dev": "node scripts/launch-development.mjs",
+    "desktop:package": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --win --x64",
+    "check:music": "node scripts/check-music-assets.mjs",
+    "test:sync": "node tests/webdav-sync.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "1.31.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3",
+    "vite": "8.0.13"
+  }
+}

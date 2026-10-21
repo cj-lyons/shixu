@@ -1,0 +1,63 @@
+node_modules/
+data/
+.env
+dist/
+verification/
+.playwright-cli/
+desktop/app/
+desktop/*.zip
+desktop-release/
+output/
+desktop/dev-app/
+
+# Private music library: rights unverified, never upload audio.
+music/养心曲/
+
+# Local source snapshots are retained separately from published source.
+versions/
+
+# Credentials and local diagnostics
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Local browser profiles and design-session captures
+/${profile}/
+design/
+**/Partitions/
+**/Local State
+**/DevToolsActivePort
+
+# Audio stays on the user's machine, including original compositions
+*.mp3
+*.wav
+*.flac
+*.ogg
+*.m4a
+*.aac
+*.webm
+music/养心曲-版权清单.json
+
+# Machine-specific deployment helpers and receipts
+register-baota.py
+部署验收.md
+查看登录信息.cmd
+打开拾序.url
+start.ps1
+启动拾序.cmd
+
+# Local notes and music administration stay outside the source repository
+/music/
+/坚果云两台电脑使用说明.md
+/开发版说明.md
+/托盘功能说明.md
+/桌面版说明.md
+/花语主题说明.md

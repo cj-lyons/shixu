@@ -1,0 +1,52 @@
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import { DatabaseSync } from 'node:sqlite';
+import { mkdtempSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
+import { createHash, randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
+import { startServer } from '../server/index.mjs';
+const files=new Map(),history=[],key=randomBytes(32);let online=true,intercept=null,failAfterPut=false;
+const protect={encrypt(text){const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key,iv),data=Buffer.concat([cipher.update(text),cipher.final()]);return Buffer.concat([iv,cipher.getAuthTag(),data]).toString('base64');},decrypt(text){const bytes=Buffer.from(text,'base64'),cipher=createDecipheriv('aes-256-gcm',key,bytes.subarray(0,12));cipher.setAuthTag(bytes.subarray(12,28));return Buffer.concat([cipher.update(bytes.subarray(28)),cipher.final()]).toString();}};
+const etag=value=>'"'+createHash('sha256').update(value).digest('hex')+'"';
+const mock=http.createServer(async(req,res)=>{
+ if(!online){res.writeHead(503);return res.end();}
+ if(req.headers.authorization!=='Basic '+Buffer.from('test@example.com:test-app-password').toString('base64')){res.writeHead(401);return res.end();}
+ const route=decodeURIComponent(req.url),existing=files.get(route);history.push(req.method+' '+route);
+ if(req.method==='MKCOL'){res.writeHead(201);return res.end();}
+ if(req.method==='PROPFIND'){if(intercept){const fn=intercept;intercept=null;await fn();}res.writeHead(207,{'Content-Type':'application/xml'});return res.end('<d:multistatus xmlns:d="DAV:"><d:response><d:href>'+req.url.replace(/\/$/,'').replace(/%[0-9A-F]{2}/g,s=>s.toLowerCase())+'</d:href></d:response>'+[...files.keys()].filter(k=>k.startsWith(route)).map(k=>'<d:response><d:href>'+encodeURI(k)+'</d:href></d:response>').join('')+'</d:multistatus>');}
+ if(req.method==='GET'){if(!existing){res.writeHead(404);return res.end();}res.writeHead(200,{ETag:etag(existing)});return res.end(existing);}
+ if(req.method==='PUT'){if(req.headers['if-none-match']==='*'&&existing||req.headers['if-match']&&req.headers['if-match']!==etag(existing||'')){res.writeHead(412);return res.end();}const chunks=[];for await(const c of req)chunks.push(c);files.set(route,Buffer.concat(chunks).toString());if(failAfterPut&&route.endsWith('.json')){failAfterPut=false;res.writeHead(503);return res.end();}res.writeHead(201);return res.end();}
+ if(req.method==='DELETE'){files.delete(route);res.writeHead(204);return res.end();}res.writeHead(405);res.end();
+});
+await new Promise(r=>mock.listen(0,'127.0.0.1',r));
+mkdirSync(path.resolve('output'),{recursive:true});
+const dir=mkdtempSync(path.resolve('output/webdav-')),services=[];
+async function client(name){const service=await startServer({root:path.resolve('.'),dataDir:path.join(dir,name),desktop:true,host:'127.0.0.1',port:0,syncSecrets:protect,syncEndpoint:`http://127.0.0.1:${mock.address().port}/dav/`});services.push(service);return {service,async call(route,body){const response=await fetch(service.url+'/api/'+route,{method:body===undefined?'GET':'POST',headers:{Cookie:'shixu_session='+service.token,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const value=await response.json();if(!response.ok)throw Error(value.error);return value;},async get(){return (await this.call('workspace')).data;},async put(update){const response=await fetch(service.url+'/api/workspace',{headers:{Cookie:'shixu_session='+service.token}}),old=await response.json(),data=update(structuredClone(old.data));const result=await fetch(service.url+'/api/workspace',{method:'PUT',headers:{Cookie:'shixu_session='+service.token,'Content-Type':'application/json'},body:JSON.stringify({data,revision:old.revision,formatVersion:2})});assert.equal(result.status,200);return data;}};}
+const task=(id,title)=>({id,title,category:'inbox',due:'',owner:'',from:'',standard:'',estimate:25,energy:'medium',done:false,coreDate:'',created:'2026-10-19T01:00:00Z'}),settings={account:'test@example.com',password:'test-app-password',folder:'拾序同步'};
+try{
+ const a=await client('office'),b=await client('home');
+ assert.equal((await a.call('sync')).configured,false);
+ await a.put(d=>({...d,tasks:[task('shared','Office original')]}));
+ const ap=await a.call('sync/test',settings);assert.equal(ap.localTasks,1);assert.equal(ap.remoteTasks,0);
+ let status=await a.call('sync/connect',{...settings,previewToken:ap.previewToken});assert.equal(status.error,'');assert.equal(status.conflicts.length,0);
+ assert.ok(!JSON.stringify(status).includes(settings.password));assert.ok(!readFileSync(path.join(dir,'office','shixu.sqlite')).includes(Buffer.from(settings.password)));
+ const bp=await b.call('sync/test',settings);assert.equal(bp.remoteTasks,1);status=await b.call('sync/connect',{...settings,previewToken:bp.previewToken});assert.equal(status.error,'');assert.equal(status.conflicts.length,0);assert.equal((await b.get()).tasks[0].title,'Office original');
+ await b.put(d=>({...d,tasks:d.tasks.map(t=>({...t,title:'Home edit'}))}));await b.call('sync/run',{});await a.call('sync/run',{});assert.equal((await a.get()).tasks[0].title,'Home edit');
+ online=false;await a.put(d=>({...d,tasks:d.tasks.map(t=>({...t,title:'Offline office'}))}));status=await a.call('sync/run',{});assert.ok(status.error);assert.equal(status.pending,true);assert.equal((await a.get()).tasks[0].title,'Offline office');online=true;
+ await b.put(d=>({...d,tasks:d.tasks.map(t=>({...t,title:'Concurrent home'}))}));await b.call('sync/run',{});status=await a.call('sync/run',{});assert.equal(status.conflicts.length,1);assert.equal((await a.get()).tasks[0].title,'Offline office');
+ const conflict=status.conflicts[0],chosen=conflict.versions.find(v=>v.value.title==='Concurrent home');await a.call('sync/resolve',{key:conflict.key,version:chosen});await a.call('sync/run',{});status=await b.call('sync/run',{});assert.equal(status.conflicts.length,0);assert.equal((await a.get()).tasks[0].title,'Concurrent home');assert.equal((await b.get()).tasks[0].title,'Concurrent home');
+ await a.put(d=>({...d,tasks:[...d.tasks,task('extra','Independent task')]}));await b.put(d=>({...d,sessions:[{id:'session-home',taskId:'shared',title:'Focus',minutes:25,date:'2026-10-19'}]}));await a.call('sync/run',{});await b.call('sync/run',{});await a.call('sync/run',{});assert.equal((await a.get()).sessions.length,1);assert.equal((await b.get()).tasks.length,2);
+ await a.put(d=>({...d,tasks:d.tasks.filter(t=>t.id!=='extra')}));await a.call('sync/run',{});await b.call('sync/run',{});assert.equal((await b.get()).tasks.length,1);
+ intercept=async()=>{await b.put(d=>({...d,tasks:[...d.tasks,task('during','Written during pull')]}));};await b.call('sync/run',{});assert.ok((await b.get()).tasks.some(t=>t.id==='during'));
+ failAfterPut=true;await b.put(d=>({...d,tasks:d.tasks.map(t=>t.id==='during'?{...t,title:'Upload interrupted'}:t)}));status=await b.call('sync/run',{});assert.ok(status.error);assert.ok(status.pending);status=await b.call('sync/run',{});assert.equal(status.error,'');await a.call('sync/run',{});assert.ok((await a.get()).tasks.some(t=>t.title==='Upload interrupted'));
+ const badName='/dav/拾序同步/device-00000000-0000-0000-0000-000000000000.json';files.set(badName,'{"format":999}');const before=await a.get();status=await a.call('sync/run',{});assert.ok(status.error);assert.deepEqual(await a.get(),before);files.delete(badName);
+ await assert.rejects(a.call('sync/test',{...settings,password:'wrong'}),/授权失败/);assert.deepEqual(await a.get(),before);
+ await a.put(d=>({...d,tasks:d.tasks.map(t=>t.id==='shared'?{...t,lastProgress:'已发出定稿',resumeFrom:'等确认后补案例',followUpAt:'2026-10-24T15:00'}:t),sessions:[...d.sessions,{id:'stage-v2',taskId:'shared',title:'阶段记录',minutes:25,date:'2026-10-20',goal:'先整理提纲',progress:'提纲完成',resumeFrom:'第二个案例',endedAt:'2026-10-20T04:00:00.000Z'}]}));await a.call('sync/run',{});await b.call('sync/run',{});const phaseData=await b.get();assert.equal(phaseData.tasks.find(t=>t.id==='shared').lastProgress,'已发出定稿');assert.equal(phaseData.tasks.find(t=>t.id==='shared').followUpAt,'2026-10-24T15:00');assert.equal(phaseData.sessions.find(t=>t.id==='stage-v2').resumeFrom,'第二个案例');
+ const cloudVersion=JSON.parse([...files.entries()].find(([name])=>name.endsWith('.json'))[1]);assert.equal(cloudVersion.format,2);const legacyRecords=await import('../versions/1.7.0-dev-20261020-before-stages/server/sync-records.mjs');assert.throws(()=>legacyRecords.validateSnapshot(cloudVersion));
+ await a.service.close();services.splice(services.indexOf(a.service),1);
+ const legacy=new DatabaseSync(path.join(dir,'office','shixu.sqlite')),stored=legacy.prepare('SELECT user_id,data FROM workspaces LIMIT 1').get(),legacyData=JSON.parse(stored.data);legacyData.tasks[0].standard='Changed with older client';legacy.prepare('UPDATE workspaces SET data=?,revision=revision+1 WHERE user_id=?').run(JSON.stringify(legacyData),stored.user_id);legacy.close();
+ const restarted=await client('office');assert.equal((await restarted.call('sync')).configured,true);status=await restarted.call('sync/run',{});assert.equal(status.error,'');await b.call('sync/run',{});assert.equal((await b.get()).tasks[0].standard,'Changed with older client');
+ status=await b.call('sync/disconnect',{});assert.equal(status.configured,false);assert.equal((await b.get()).tasks.length,2);assert.ok(files.size>=2);
+ assert.ok(readdirSync(path.join(dir,'home','sync-backups')).length>0);
+ console.log(JSON.stringify({passed:true,checks:['first preview and empty-home onboarding','two independent SQLite databases exchange edits','encrypted credentials excluded from status','offline edits survive and reconnect','concurrent edits preserve both versions and explicit resolution converges','independent additions and saved sessions merge','deletion propagates','writes during network pull preserved','interrupted upload retried','corrupt cloud data and wrong credentials do not overwrite local data','disconnect preserves both sides','pre-merge local backups','restart decrypts saved credentials and captures changes from older clients','stage notes and handoff fields survive two-way sync','legacy sync reader rejects format 2 without importing'],artifacts:dir},null,2));
+}finally{await Promise.all(services.map(s=>s.close()));await new Promise(r=>mock.close(r));}

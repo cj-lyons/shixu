@@ -1,0 +1,10 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { themes, paletteFor } from '../src/flower-catalog.ts';
+const legacy=new Set(['sakura','blue','chrysanthemum']);
+const css='/* Generated from flower-catalog.ts; retain the three original palettes. */\n'+themes.filter(t=>!legacy.has(t.id)).map(theme=>`[data-theme="${theme.id}"]{${Object.entries(paletteFor(theme)).map(([key,value])=>`${key}:${value}`).join(';')}}`).join('\n')+'\n';
+await writeFile(new URL('../src/flower-palettes.css',import.meta.url),css);
+const indexPath=new URL('../index.html',import.meta.url),before=await readFile(indexPath,'utf8');
+const after=before.replace(/if\(\[[^\]]*\]\.includes\(t\)\)/,`if(${JSON.stringify(themes.map(t=>t.id))}.includes(t))`);
+if(!after.includes(JSON.stringify(themes.map(t=>t.id))))throw Error('Theme bootstrap marker not found');
+if(after!==before)await writeFile(indexPath,after);
+console.log(`Prepared ${themes.length} flower themes.`);

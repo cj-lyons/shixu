@@ -1,0 +1,9 @@
+* text=auto
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.tsx text eol=lf
+*.ts text eol=lf
+*.md text eol=lf
+*.vbs text eol=crlf
+*.ico binary
+*.png binary
