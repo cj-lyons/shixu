@@ -29,7 +29,7 @@ npm run test:sync
 npm run desktop:dev
 ```
 
-将 YOUR_GITHUB_USERNAME 换成自己的 GitHub 用户名。也可以克隆原仓库学习；提交 PR 时从自己的 Fork 发起。私有阶段需要先取得仓库访问权限，以上流程不会自动开放仓库。
+将 YOUR_GITHUB_USERNAME 换成自己的 GitHub 用户名。也可以克隆原仓库学习；提交 PR 时从自己的 Fork 发起。仓库现已公开，无需申请仓库写权限即可通过 Fork 发起 PR。
 
 开发版使用 AppData/Roaming/ShixuDevelopment，日常版使用 ShixuDesktop，数据目录相互独立。首次测试使用虚构任务；不要用日常数据库做迁移或恢复试验。关窗口会收进托盘，需要从托盘退出后再重新启动。
 
