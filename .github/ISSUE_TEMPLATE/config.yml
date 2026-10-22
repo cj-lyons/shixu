@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 下载 Windows 体验版
+    url: https://github.com/cj-lyons/shixu/releases
+    about: 查看安装版、免安装版及已知限制。
+  - name: 贡献说明与开发运行
+    url: https://github.com/cj-lyons/shixu/blob/main/CONTRIBUTING.md
+    about: 提交 PR 前先阅读开发步骤、验证要求和素材授权范围。

@@ -1,0 +1,31 @@
+name: 功能建议
+description: 分享使用场景和希望改善的体验
+title: "[建议] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        拾序希望保持简洁、易操作。请先描述使用中的困难，不必设计完整方案；示例请使用虚构信息。
+  - type: textarea
+    id: scenario
+    attributes:
+      label: 什么场景下遇到了什么困难？
+      description: 现在怎样操作，哪里费力或容易遗漏？
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: 希望怎样改善？
+      description: 可以描述最小可用的改进，或举一个具体例子。
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 目前的替代办法（可选）
+  - type: textarea
+    id: simplicity
+    attributes:
+      label: 如何保持操作简洁？（可选）
+      description: 是否能复用现有入口，或按需展开？欢迎附简单草图。

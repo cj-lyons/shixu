@@ -4,6 +4,18 @@
 
 拾序是一款正在迭代的个人任务与精力管理工具，使用 React、TypeScript、Electron 和 SQLite。当前以 Windows 桌面开发版为主要验证环境，也保留独立网页服务。
 
+## 下载与体验
+
+[下载 Windows v1.8.1 体验版](https://github.com/cj-lyons/shixu/releases/tag/v1.8.1)：日常使用选择 Setup 安装版，先体验选择 Portable 免安装版。页面附 SHA-256 校验值和已知限制。
+
+安装包为未签名 Windows x64 版本，不包含个人任务、账号配置或歌曲文件。macOS 和 Linux 安装包尚未发布，欢迎协助适配与实机验证。
+
+## 反馈与参与
+
+欢迎分享哪里不顺手、报告问题、改进文档或提交 PR。请先查看 [已有 Issues](https://github.com/cj-lyons/shixu/issues)，再选择 [问题反馈或功能建议](https://github.com/cj-lyons/shixu/issues/new/choose)；开发步骤和提交要求见 [贡献说明](CONTRIBUTING.md)。
+
+较大的功能先讨论，小范围修复可以直接提 PR。请使用虚构示例，勿在反馈或提交中附带真实任务、数据库、同步凭据和私人音乐。当前私有阶段以上入口需要仓库访问权限。
+
 ## 界面预览
 
 樱花主题：今日任务、番茄专注与底部迷你播放器。
@@ -86,6 +98,8 @@ node --env-file=.env server/index.mjs
 这是持续迭代中的个人工具。曾发生本机数据库及索引异常，已进行数据恢复和重启检查，完整诱因尚未确定；请保留独立备份，不将其作为关键事务的唯一记录。模拟 WebDAV 检查不等于两台物理电脑的真实同步验收。
 
 版本变化见 [CHANGELOG.md](CHANGELOG.md)。本仓库只管理代码；GitHub 不能替代个人任务的同步或备份。
+
+公开前的历史检查范围及结果见 [检查记录](docs/PUBLICATION-REVIEW.md)。
 
 ## 使用与权利
 

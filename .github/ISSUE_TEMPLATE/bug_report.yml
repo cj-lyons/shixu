@@ -1,0 +1,66 @@
+name: 问题反馈
+description: 某个操作没有按预期工作
+title: "[问题] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请先搜索已有问题。不要上传真实任务数据库、同步文件、账号、应用密码、令牌或私人音乐；截图请遮挡个人信息。
+        疑似数据泄露问题请先通过私密方式联系维护者，不要在此公开细节。
+  - type: input
+    id: version
+    attributes:
+      label: 拾序版本
+      description: 例如 1.8.1；源码运行请填写提交号（如知道）。
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: 使用方式
+      options:
+        - Windows 安装版
+        - Windows 免安装版
+        - Windows 开发版
+        - 独立网页服务
+        - macOS 源码运行或适配
+        - Linux 源码运行或适配
+        - 其他或不确定
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 系统与环境
+      description: 系统版本和处理器架构；网页版补充浏览器，源码运行可补充 Node.js 版本。
+      placeholder: 例如 Windows 11 x64
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 如何复现
+      placeholder: |
+        1. 打开……
+        2. 点击……
+        3. 出现……
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 预期结果
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际结果
+      description: 可补充出现频率，以及从托盘完全退出后重开是否仍出现。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 截图或错误信息（可选）
+      description: 只提供相关且已脱敏的部分；请勿直接上传整份数据库或配置文件。
