@@ -1,6 +1,6 @@
 {
   "name": "shixu-independent",
-  "version": "1.0.0",
+  "version": "1.8.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,7 +11,10 @@
     "desktop:dev": "node scripts/launch-development.mjs",
     "desktop:package": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --win --x64",
     "check:music": "node scripts/check-music-assets.mjs",
-    "test:sync": "node tests/webdav-sync.mjs"
+    "test:sync": "node tests/webdav-sync.mjs",
+    "desktop:package:linux": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --linux --x64",
+    "desktop:package:mac": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --mac",
+    "test:platform": "node tests/platform.cjs"
   },
   "dependencies": {
     "lucide-react": "1.31.0",

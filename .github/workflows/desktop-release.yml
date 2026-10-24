@@ -1,0 +1,107 @@
+name: Desktop release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x64
+            executable: desktop-release/linux-unpacked/shixu
+          - os: macos-15
+            platform: mac
+            arch: arm64
+            executable: desktop-release/mac-arm64/拾序.app/Contents/MacOS/拾序
+          - os: macos-15-intel
+            platform: mac
+            arch: x64
+            executable: desktop-release/mac/拾序.app/Contents/MacOS/拾序
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y xvfb libgtk-3-0 libnss3 libasound2t64 libgbm1 libsecret-1-0 libfuse2t64
+      - name: Validate code, platform rules and simulated sync
+        run: |
+          npm run check
+          npm run test:platform
+          npm run test:sync
+      - name: Build clean desktop app
+        run: npm run desktop:prepare
+      - name: Package native platform
+        run: npx electron-builder --config electron-builder.cjs --${{ matrix.platform }} --${{ matrix.arch }} --publish never
+      - name: Audit packaged contents
+        run: node scripts/audit-desktop-package.cjs
+      - name: Install UI test driver
+        run: npm install --no-save --package-lock=false playwright@1.58.2
+      - name: Test packaged app on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node tests/desktop-release-smoke.cjs '${{ matrix.executable }}'
+      - name: Test packaged app on macOS
+        if: runner.os == 'macOS'
+        run: node tests/desktop-release-smoke.cjs '${{ matrix.executable }}'
+      - name: Upload diagnostic results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-${{ matrix.platform }}-${{ matrix.arch }}
+          path: output/release-smoke-*
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Upload validated packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            desktop-release/*.AppImage
+            desktop-release/*.deb
+            desktop-release/*.dmg
+            desktop-release/*.zip
+          if-no-files-found: error
+          retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: packages-*
+          path: release-assets
+          merge-multiple: true
+      - name: Checksum and publish preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          cd release-assets
+          sha256sum Shixu-* > SHA256SUMS.txt
+          gh release create "v$VERSION" --prerelease --target "$GITHUB_SHA" --title "拾序 v$VERSION · Linux 与 macOS 体验版" --notes-file ../docs/releases/v1.8.2.md ./*

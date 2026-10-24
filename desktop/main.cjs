@@ -1,6 +1,7 @@
 const { app, BrowserWindow, Menu, dialog, session, shell, Tray, Notification, ipcMain, nativeImage, safeStorage } = require('electron');
 const { createReminders } = require('./reminders.cjs');
 const { createTrayControls } = require('./tray-controls.cjs');
+const { canStoreSecrets, runtimeIconFile } = require('./platform.cjs');
 const musicCatalog = require('./music-catalog.json');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -11,7 +12,7 @@ const appName = devMode ? '拾序·开发版' : '拾序';
 app.setName(appName);
 const profileArg = process.argv.find(value => value.startsWith('--shixu-profile='));
 const appId = profileArg ? 'cn.shixu.focus.qa.' + require('node:crypto').createHash('sha256').update(profileArg).digest('hex').slice(0,12) : devMode ? 'cn.shixu.focus.development' : 'cn.shixu.focus.desktop';
-app.setAppUserModelId(appId);
+if (process.platform === 'win32') app.setAppUserModelId(appId);
 if (profileArg) app.setPath('userData', path.resolve(profileArg.slice('--shixu-profile='.length)));
 else app.setPath('userData', path.join(app.getPath('appData'), devMode ? 'ShixuDevelopment' : 'ShixuDesktop'));
 const portArg = process.argv.find(value => value.startsWith('--shixu-port='));
@@ -27,7 +28,7 @@ let musicDirectory='';
 try{const saved=JSON.parse(fs.readFileSync(libraryConfig,'utf8'));if(typeof saved.directory==='string')musicDirectory=saved.directory;}catch{}
 if(!musicDirectory&&devMode){const candidate=path.resolve(__dirname,'../../music/养心曲');if(fs.existsSync(candidate))musicDirectory=candidate;}
 
-const iconPath = app.isPackaged ? path.join(process.resourcesPath, 'shixu.ico') : path.join(__dirname, 'icon.ico');
+const iconPath = path.join(app.isPackaged ? process.resourcesPath : __dirname, runtimeIconFile(app.isPackaged));
 if (!app.requestSingleInstanceLock()) app.quit();
 else {
   app.on('second-instance', () => showWorkspace?.());
@@ -36,7 +37,7 @@ else {
     try {
       if (!Number.isInteger(port) || port < 1024 || port > 65535) throw Error('本机端口设置无效');
       const { startServer } = await import(pathToFileURL(path.join(__dirname, 'server.mjs')).href);
-      service = await startServer({ root: __dirname, dataDir, desktop: true, host: '127.0.0.1', port, getMusicDirectory: ()=>musicDirectory, syncSecrets: safeStorage.isEncryptionAvailable() ? { encrypt: value=>safeStorage.encryptString(value).toString('base64'), decrypt: value=>safeStorage.decryptString(Buffer.from(value,'base64')) } : undefined });
+      service = await startServer({ root: __dirname, dataDir, desktop: true, host: '127.0.0.1', port, getMusicDirectory: ()=>musicDirectory, syncSecrets: canStoreSecrets(safeStorage) ? { encrypt: value=>safeStorage.encryptString(value).toString('base64'), decrypt: value=>safeStorage.decryptString(Buffer.from(value,'base64')) } : undefined });
       const localSession = session.fromPartition('persist:shixu');
       await localSession.cookies.set({ url: service.url, name: 'shixu_session', value: service.token, httpOnly: true, sameSite: 'lax', path: '/' });
       const trusted = url => { try { return new URL(url).origin === service.url; } catch { return false; } };
@@ -58,8 +59,8 @@ else {
       window.webContents.on('will-attach-webview', event => event.preventDefault());
       if (process.platform === 'win32') window.setAppDetails({ appId, appIconPath: iconPath, appIconIndex: 0, relaunchCommand: app.isPackaged ? '"' + process.execPath + '"' : '"' + process.execPath + '" "' + app.getAppPath() + '"' + (devMode ? ' --shixu-dev' : ''), relaunchDisplayName: appName });
       window.on('page-title-updated', event => event.preventDefault());
-      window.once('ready-to-show', () => window.show());
-      window.on('close', event => { if (!quitting) { event.preventDefault(); window.hide(); } });
+      window.once('ready-to-show', () => showWorkspace());
+      window.on('close', event => { if (!quitting) { event.preventDefault(); if (tray && !tray.isDestroyed()) window.hide(); else app.quit(); } });
       window.webContents.on('did-start-loading',()=>{musicState={...musicState,ready:false,playing:false};trayControls?.refresh();});
       window.on('closed', () => { window = null;musicState={...musicState,ready:false,playing:false};trayControls?.refresh(); });
       void window.loadURL(service.url);
@@ -84,10 +85,12 @@ else {
       ipcMain.handle('shixu:reminders-enable', event => { fromWorkspace(event); const result = reminders.enable(true); reminders.test();trayControls?.refresh(); return result; });
       ipcMain.handle('shixu:timer-sync', (event, timer) => { fromWorkspace(event); return reminders.syncTimer(timer); });
       ipcMain.handle('shixu:music-state',(event,value)=>{fromWorkspace(event);if(!value||typeof value.ready!=='boolean'||typeof value.playing!=='boolean'||typeof value.automatic!=='boolean'||typeof value.title!=='string'||value.title.length>160||(value.id!==null&&!musicCatalog.some(song=>song.id===value.id)))throw Error('音乐状态无效');musicState={ready:value.ready,playing:value.playing,automatic:value.automatic,title:value.title.replace(/[\r\n]/g,' '),id:value.id};trayControls?.refresh();});
-      tray = new Tray(nativeImage.createFromPath(iconPath));
+      try { tray = new Tray(nativeImage.createFromPath(iconPath).resize({ width: 20, height: 20 })); } catch (error) { console.warn('系统托盘不可用，关闭窗口将退出拾序。'); }
+      if (tray) {
       trayControls=createTrayControls({Menu,tray,appName,reminders,catalog:musicCatalog,getMusic:()=>musicState,sendMusic:command=>{if(window&&!window.isDestroyed()&&musicState.ready)window.webContents.send('shixu:music-command',command);},startTimer:()=>{if(window&&!window.isDestroyed()&&musicState.ready)window.webContents.send('shixu:timer-command');else showWorkspace();},open:()=>showWorkspace(),quit:()=>app.quit(),onTimer:publishTimer,onReminder:publishReminder});
       if(profileArg)app.__shixuTrayControls=trayControls;
       tray.on('click', () => showWorkspace());
+      }
       Menu.setApplicationMenu(Menu.buildFromTemplate([
         { label: '拾序', submenu: [{ label: '关于' + appName, click: () => dialog.showMessageBox(window, { title: '拾序', message: devMode ? '拾序·开发版 · 独立测试数据' : '拾序 · 任务与精力管理', detail: `桌面版 ${app.getVersion()}\n四季花语 · 16 种花卉主题\n© 2026 CheJ。源代码采用 MIT 许可证。\n音乐与品牌素材另行授权。\n第三方开源组件及音乐版权归各自权利人所有。\n本机保存，无需 Docker 或宝塔。\n关闭窗口收进右下角托盘，软件提醒继续运行。\n右键托盘选择“退出拾序”才会停止。` }) }, { type: 'separator' }, { label: '收起到托盘', click: () => window?.hide() }, { label: '发送测试提醒', click: () => { reminders.enable(true); reminders.test(); } }, { label: '退出拾序', role: 'quit' }] },
         { label: '内容', submenu: [{label:'打开内容后台',click:()=>showContentAdmin()}] },

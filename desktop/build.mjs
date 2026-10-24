@@ -14,12 +14,14 @@ await cp('desktop/main.cjs', path.join(target, 'main.cjs'));
 await cp('desktop/preload.cjs', path.join(target, 'preload.cjs'));
 await cp('desktop/reminders.cjs', path.join(target, 'reminders.cjs'));
 await cp('desktop/tray-controls.cjs', path.join(target, 'tray-controls.cjs'));
+await cp('desktop/platform.cjs', path.join(target, 'platform.cjs'));
 await writeFile(path.join(target,'music-catalog.json'),JSON.stringify(bundledTracks.map(({id,title})=>({id,title}))));
 await cp(devMode ? 'desktop/dev-icon.ico' : 'desktop/icon.ico', path.join(target, 'icon.ico'));
+await cp('desktop/icon.png', path.join(target, 'icon.png'));
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
 await cp('LICENSE', path.join(target, 'LICENSE'));
 await cp('ASSET-LICENSE.md', path.join(target, 'ASSET-LICENSE.md'));
-await writeFile(path.join(target, 'package.json'), JSON.stringify({ name: 'shixu-desktop', productName: '拾序', version: '1.8.1', description: '拾序个人任务与精力管理桌面版', author: 'Shixu', main: 'main.cjs', license: pkg.license || 'MIT', private: true }, null, 2));
+await writeFile(path.join(target, 'package.json'), JSON.stringify({ name: 'shixu-desktop', productName: '拾序', version: pkg.version, description: '拾序个人任务与精力管理桌面版', author: 'CheJ', main: 'main.cjs', license: pkg.license || 'MIT', private: true }, null, 2));
 await writeFile(path.join(target, 'THIRD-PARTY-NOTICES.txt'), 'Shixu Desktop\nElectron: MIT; Node.js and Chromium notices ship alongside the executable.\nReact, React DOM, Lucide React, Zod: MIT / ISC.\n\n' + await readFile('node_modules/zod/LICENSE', 'utf8'));
 for (const name of Object.keys(pkg.dependencies)) {
   for (const file of ['LICENSE', 'LICENSE.txt']) {
