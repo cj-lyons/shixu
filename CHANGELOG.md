@@ -1,11 +1,12 @@
 # 拾序版本更新记录
 
-## 1.8.2 · Linux 与 macOS 体验包准备（2026-10-24）
+## 1.8.2 · Linux 与 macOS 体验包（2026-10-24）
 
 - 新增 Linux x64 的 AppImage / deb，以及苹果芯片与 Intel Mac 的 DMG / ZIP 打包配置。
 - 原生图标、Windows 专属调用、开发启动路径、Linux 密钥环及托盘不可用时的退出行为按平台处理。
 - 新增原生构建机上的包内容检查与启动、任务、计时、主题、重启保存检查；只有全部构建与验证成功才创建体验版 Release。
 - 本次不覆盖 Windows v1.8.1；Mac 未配置 Developer ID 签名与公证，用户桌面集成和真实云同步仍需实机反馈。
+- GitHub Actions 原生 Ubuntu x64、Mac arm64 与 Intel Mac 三项构建及已打包应用验证均通过；[构建记录](https://github.com/cj-lyons/shixu/actions/runs/40074517471)，[下载页](https://github.com/cj-lyons/shixu/releases/tag/v1.8.2)。
 
 ## 版权署名更新（2026-10-24）
 

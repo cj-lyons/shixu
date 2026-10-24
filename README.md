@@ -6,9 +6,17 @@
 
 ## 下载与体验
 
-[下载 Windows v1.8.1 体验版](https://github.com/cj-lyons/shixu/releases/tag/v1.8.1)：日常使用选择 Setup 安装版，先体验选择 Portable 免安装版。页面附 SHA-256 校验值和已知限制。
+| 平台 | 下载与选择 |
+| --- | --- |
+| Windows x64 | [v1.8.1：安装版 / 免安装版](https://github.com/cj-lyons/shixu/releases/tag/v1.8.1) |
+| Ubuntu / Debian x64 | [v1.8.2：deb](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-linux-amd64.deb) |
+| Linux x64 | [v1.8.2：AppImage](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-linux-x86_64.AppImage) |
+| 苹果芯片 Mac（M 系列） | [v1.8.2：arm64 DMG](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-arm64.dmg) |
+| Intel Mac | [v1.8.2：x64 DMG](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-x64.dmg) |
 
-安装包为未签名 Windows x64 版本，不包含个人任务、账号配置或歌曲文件。macOS 和 Linux 安装包尚未发布，欢迎协助适配与实机验证。
+[Linux / macOS 完整下载页及 SHA-256 校验值](https://github.com/cj-lyons/shixu/releases/tag/v1.8.2)。Mac 同时提供 ZIP。各包不包含个人任务、账号配置或歌曲文件。
+
+均为体验版，未提供开发者证书签名，Mac 尚未 Apple 公证，系统可能阻止打开。Linux 与两种 Mac 架构已在 GitHub 原生构建机验证启动、任务保存、计时、主题及重启保存；不等于所有用户桌面、通知和真实云同步均已验证。详细限制请先阅读下载页。
 
 ## 反馈与参与
 
@@ -55,7 +63,7 @@
 
 ## 开发运行
 
-需要 Windows、Node.js 24.12 或更新的 24.x 版本和 npm。
+需要 Node.js 24.12 或更新的 24.x 版本和 npm。Windows 为主要日常开发环境；Linux 与 macOS 已加入原生构建机验证，具体环境差异见 [v1.8.2 说明](docs/releases/v1.8.2.md)。
 
 ```powershell
 npm ci
@@ -64,7 +72,7 @@ npm run test:sync
 npm run desktop:dev
 ```
 
-开发版数据在 Windows 用户目录的 AppData/Roaming/ShixuDevelopment；正式桌面版使用 ShixuDesktop，二者独立。关闭工作台会收进托盘，选择“退出拾序”才完全退出。
+开发版与日常版分别使用 ShixuDevelopment 和 ShixuDesktop 数据目录，二者独立。Windows 位于 AppData/Roaming，Mac 位于 ~/Library/Application Support，Linux 位于系统配置目录（通常为 ~/.config）。有可用托盘时，关闭工作台会收进托盘，选择“退出拾序”才完全退出；托盘初始化失败时关闭窗口会退出。
 
 源码修改后重新运行开发启动命令会重新构建。Ctrl+R 只重新加载已构建的界面；原生菜单、提醒和后台修改需要完全退出后重开。
 

@@ -15,7 +15,7 @@
 
 ## 本地开发
 
-当前主要验证 Windows x64。需要 Node.js 24.12 或更新的 24.x 版本，以及 npm；Electron 后台使用 Node 原生 SQLite。macOS / Linux 桌面启动与打包尚未完成适配验证。
+需要 Node.js 24.12 或更新的 24.x 版本，以及 npm；Electron 后台使用 Node 原生 SQLite。Windows x64 为主要日常验证环境，Linux x64、Mac arm64 / x64 已加入原生构建机的打包、启动和任务保存验证。仍欢迎提供真实桌面的托盘、提醒、音乐和同步反馈，CI 验证不能替代用户实机兼容性测试。
 
 Fork 仓库后克隆自己的副本，建立分支：
 
