@@ -10,3 +10,5 @@
 @media(max-width:720px){.top-right .avatar{display:grid}.top-right{gap:10px}}
 
 .login-form{width:310px;max-width:100%;text-align:left}.login-form label{display:block;color:#829373;font-size:12px;margin:0 0 20px}.login-form input{box-sizing:border-box;display:block;width:100%;margin-top:8px;border:1px solid #dce4d3;border-radius:7px;background:white;padding:12px;font-size:16px}.login-form [role=alert]{color:#ad5747;font-size:12px;margin-bottom:18px}.login-form button{width:100%}
+
+.task-reminder-field{margin:16px 0;padding:14px 16px;border:1px solid var(--line);border-radius:12px}.task-reminder-field label{margin:0}.reminder-shortcuts{display:flex;gap:18px;margin:8px 0}.task-reminder-field small{font-size:12px;color:var(--muted)}

@@ -28,23 +28,23 @@
 
 | 系统 | 推荐下载 | 其他选择 |
 | --- | --- | --- |
-| **Windows x64** | [安装版 · v1.8.1](https://github.com/cj-lyons/shixu/releases/download/v1.8.1/Shixu-1.8.1-x64-Setup.exe) | [免安装版](https://github.com/cj-lyons/shixu/releases/download/v1.8.1/Shixu-1.8.1-x64-Portable.exe) |
-| **macOS · 苹果芯片 M 系列** | [DMG · arm64 · v1.8.2](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-arm64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-arm64.zip) |
-| **macOS · Intel** | [DMG · x64 · v1.8.2](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-x64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-mac-x64.zip) |
-| **Ubuntu / Debian x64** | [deb · v1.8.2](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-linux-amd64.deb) | [AppImage](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-linux-x86_64.AppImage) |
-| **其他 Linux x64** | [AppImage · v1.8.2](https://github.com/cj-lyons/shixu/releases/download/v1.8.2/Shixu-1.8.2-linux-x86_64.AppImage) | 需系统支持 FUSE |
+| **Windows x64** | [安装版 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-x64-Setup.exe) | [免安装版](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-x64-Portable.exe) |
+| **macOS · 苹果芯片 M 系列** | [DMG · arm64 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-arm64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-arm64.zip) |
+| **macOS · Intel** | [DMG · x64 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-x64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-x64.zip) |
+| **Ubuntu / Debian x64** | [deb · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-amd64.deb) | [AppImage](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-x86_64.AppImage) |
+| **其他 Linux x64** | [AppImage · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-x86_64.AppImage) | 需系统支持 FUSE |
 
 Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImage 需先授予执行权限。各平台安装包不附带个人任务、账号配置或歌曲文件。
 
-> **体验版说明**：当前未提供开发者证书签名，Mac 尚未 Apple 公证，系统可能阻止打开。Linux 与两种 Mac 架构已在 GitHub 原生构建机验证启动、任务保存、计时、主题及重启保存；不等于所有用户桌面、通知和真实云同步均已验证。
+> **体验版说明**：当前未提供开发者证书签名，Mac 尚未 Apple 公证，系统可能阻止打开。本版按平台构建，并通过打包应用的启动、任务保存、计时、主题及重启测试后发布；不等于所有用户桌面、系统通知和真实云同步均已验证。
 >
-> 完整文件、校验值和已知限制：[Windows v1.8.1](https://github.com/cj-lyons/shixu/releases/tag/v1.8.1) · [Linux / macOS v1.8.2](https://github.com/cj-lyons/shixu/releases/tag/v1.8.2)
+> 完整文件、校验值和已知限制：[v1.11.0 下载与更新说明](https://github.com/cj-lyons/shixu/releases/tag/v1.11.0)
 
 ## 拾序可以做什么
 
 ### 1. 先记下来，让脑子腾出空间
 
-临时出现的事情先放进收件箱，再分到集中处理、交接与等待。区分“我来做”和“等别人做”，把负责人、完成标准和下一步记清楚。
+临时出现的事情先放进收件箱；未来的事通过“安排以后”提前记下，到了当天进入今日安排和原清单。再按需要分到集中处理、交接与等待。区分“我来做”和“等别人做”，把负责人、完成标准和下一步记清楚。
 
 ### 2. 一次推进一件重要的事
 
@@ -52,7 +52,7 @@ Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImag
 
 ### 3. 让休息成为工作流程的一部分
 
-专注、短休息和长休息按自己的状态安排。托盘支持查看与控制计时，时间到后可以收到系统提醒；不必把所有事情完成，才允许自己休息。
+专注、短休息和长休息按自己的状态安排。另有独立的活动与喝水提醒，可关闭的空闲判断、会议暂停和跟随花色的小卡片；托盘收起后继续运行。不必把所有事情完成，才允许自己休息。
 
 ### 4. 花语、精力和音乐，放在同一个工作台
 

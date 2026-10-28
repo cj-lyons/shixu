@@ -38,9 +38,27 @@ const launch = async () => {
   await page.waitForFunction(() => document.documentElement.dataset.theme === 'tulip');
   await page.screenshot({ path: path.resolve('output/release-smoke-' + process.platform + '-' + process.arch + '.png') });
   checks.push('Flower theme switching');
+  await page.getByRole('switch',{name:'起身活动提醒',exact:true}).waitFor();
+  let wellbeing=await page.evaluate(()=>window.shixuDesktop.getWellbeing());
+  await page.evaluate(async()=>{const value=await window.shixuDesktop.getWellbeing();await window.shixuDesktop.configureWellbeing({...value.config,idlePause:false});await window.shixuDesktop.pauseWellbeing(30);});
+  wellbeing=await page.evaluate(()=>window.shixuDesktop.getWellbeing());
+  if(wellbeing.config.idlePause!==false||Math.abs(wellbeing.meetingUntil-Date.now()-1800000)>5000)throw Error('Wellbeing configuration or meeting pause failed');
+  checks.push('Wellbeing bridge, optional idle setting and meeting pause');
+  if(wellbeing.notificationsEnabled){
+    const opened=desktop.waitForEvent('window');
+    await page.evaluate(()=>window.shixuDesktop.testWellbeing());
+    const card=await opened;await card.getByRole('heading',{name:'起身，让思绪透透气'}).waitFor();
+    await card.getByText('郁金香 · 真诚 · 祝福',{exact:true}).waitFor();
+    await card.screenshot({path:path.resolve('output/release-smoke-'+process.platform+'-'+process.arch+'-card.png')});
+    await Promise.all([card.waitForEvent('close'),page.evaluate(()=>window.shixuDesktop.pauseWellbeing(60))]);
+    checks.push('Themed reminder card and meeting dismissal');
+  }else checks.push('Native notifications unavailable on build host; reminder card runtime check skipped');
   await desktop.close(); desktop = null;
   page = await launch();
   if (!(await read()).data.tasks.some(t => t.title === '跨平台发行包测试任务')) throw Error('Task lost on restart');
+  wellbeing=await page.evaluate(()=>window.shixuDesktop.getWellbeing());
+  if(wellbeing.config.idlePause!==false||!(wellbeing.meetingUntil>Date.now()))throw Error('Wellbeing settings lost on restart');
+  await page.evaluate(()=>window.shixuDesktop.pauseWellbeing(0));
   checks.push('Saved task survives full restart');
   if (errors.length) throw Error(errors.join('; '));
   const report = { passed: true, ...info, checks, limits: ['No real cloud credentials or physical-user-device tests', 'Linux CI uses Xvfb and test-only no-sandbox; desktop environment integration still requires user testing'] };

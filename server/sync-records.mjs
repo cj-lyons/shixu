@@ -54,7 +54,7 @@ export function materialize(records,current){
  return dataSchema.parse({tasks,sessions,energy,prefs});
 }
 export function validateSnapshot(input){
- if(!input||![1,2].includes(input.format)||!/^[-a-f0-9]{36}$/.test(input.device)||!input.records||typeof input.records!=='object'||Array.isArray(input.records)||Object.keys(input.records).length>30000)throw Error('云端同步文件格式不兼容。');
+ if(!input||![1,2,3].includes(input.format)||!/^[-a-f0-9]{36}$/.test(input.device)||!input.records||typeof input.records!=='object'||Array.isArray(input.records)||Object.keys(input.records).length>30000)throw Error('云端同步文件格式不兼容，请将两台电脑都升级到新版拾序。');
  for(const [key,versions]of Object.entries(input.records)){
   if(!/^(task|session|energy|core|pref):.{1,100}$/.test(key)||!Array.isArray(versions)||!versions.length||versions.length>30)throw Error('云端记录格式无效。');
   for(const version of versions){

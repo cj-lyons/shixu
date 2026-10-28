@@ -23,8 +23,9 @@ CREATE TABLE IF NOT EXISTS sessions(token_hash TEXT PRIMARY KEY,user_id TEXT NOT
 CREATE TABLE IF NOT EXISTS workspaces(user_id TEXT PRIMARY KEY,data TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS app_meta(key TEXT PRIMARY KEY,value TEXT NOT NULL);`);
 const oldFormat=Number(db.prepare("SELECT value FROM app_meta WHERE key='dataFormat'").get()?.value||1);
+if(oldFormat>DATA_FORMAT_VERSION){db.close();throw Error('数据由较新的拾序保存，请使用新版打开，避免旧版覆盖。');}
 if(oldFormat<DATA_FORMAT_VERSION){
- if(db.prepare('SELECT COUNT(*) AS n FROM workspaces').get().n>0){const backupDir=path.join(dataDir,'schema-backups');mkdirSync(backupDir,{recursive:true});db.prepare('VACUUM INTO ?').run(path.join(backupDir,'before-1.8.0-'+Date.now()+'-'+randomBytes(4).toString('hex')+'.sqlite'));}
+ if(db.prepare('SELECT COUNT(*) AS n FROM workspaces').get().n>0){const backupDir=path.join(dataDir,'schema-backups');mkdirSync(backupDir,{recursive:true});db.prepare('VACUUM INTO ?').run(path.join(backupDir,'before-format-'+DATA_FORMAT_VERSION+'-'+Date.now()+'-'+randomBytes(4).toString('hex')+'.sqlite'));}
  db.prepare("INSERT INTO app_meta(key,value) VALUES('dataFormat',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(String(DATA_FORMAT_VERSION));
 }
 const flowerContent=createFlowerContent(db);

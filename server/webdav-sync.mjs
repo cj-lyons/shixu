@@ -73,7 +73,7 @@ export function createWebdavSync({db,userId,dataDir,secrets,endpoint='https://da
     const dir=path.join(dataDir,'sync-backups');mkdirSync(dir,{recursive:true});writeFileSync(path.join(dir,'before-merge-'+Date.now()+'-'+randomUUID()+'.json'),JSON.stringify({format:1,created:new Date().toISOString(),data:before.data}),{flag:'wx'});
    }
    db.exec('BEGIN IMMEDIATE');try{store({...s,records,error:''});if(!equal(data,before.data))db.prepare('UPDATE workspaces SET data=?,revision=revision+1 WHERE user_id=?').run(JSON.stringify(data),userId);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}
-   s=state();const snapshot={format:2,device:s.device,records:s.records},uploaded=digest(s.records),own=snapshots.find(x=>x.snapshot.device===s.device);
+   s=state();const snapshot={format:3,device:s.device,records:s.records},uploaded=digest(s.records),own=snapshots.find(x=>x.snapshot.device===s.device);
    if(own&&!own.etag)throw failure('网盘未提供文件版本保护，已停止上传。');
    const response=await request(c,`device-${s.device}.json`,{method:'PUT',headers:{'Content-Type':'application/json; charset=utf-8',...(own?{'If-Match':own.etag}:{'If-None-Match':'*'})},body:JSON.stringify(snapshot)});
    if(response.status===412)throw failure('云端刚有新修改，请再次同步；本机修改已保留。');if(![200,201,204].includes(response.status))throw failure('同步上传未完成，本机修改已保留。');

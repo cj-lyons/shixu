@@ -5,7 +5,7 @@ import './sync-control.css';
 type Version={clock:Record<string,number>;value:unknown};
 type SyncStatus={available:boolean;configured:boolean;running:boolean;pending:boolean;lastAt:string|null;error:string;folder:string;account:string;conflicts:{key:string;versions:Version[]}[]};
 type Preview={previewToken:string;devices:number;localTasks:number;remoteTasks:number;conflicts:number};
-const fieldNames:Record<string,string>={goal:'本段目标',progress:'本段进展',resumeFrom:'继续位置',lastProgress:'已推进到',followUpAt:'计划跟进',phaseUpdatedAt:'进展更新时间',endedAt:'专注结束时间',interruptedSessionId:'打扰关联',title:'内容',category:'清单',due:'截止时间',owner:'负责人',from:'交办人',standard:'完成标准',estimate:'预计分钟',energy:'精力',done:'完成状态',created:'创建时间',taskId:'事项编号',minutes:'专注分钟',date:'日期'};
+const fieldNames:Record<string,string>={remindAt:'提醒时间',goal:'本段目标',progress:'本段进展',resumeFrom:'继续位置',lastProgress:'已推进到',followUpAt:'计划跟进',phaseUpdatedAt:'进展更新时间',endedAt:'专注结束时间',interruptedSessionId:'打扰关联',title:'内容',category:'清单',due:'截止时间',owner:'负责人',from:'交办人',standard:'完成标准',estimate:'预计分钟',energy:'精力',done:'完成状态',created:'创建时间',taskId:'事项编号',minutes:'专注分钟',date:'日期'};
 const valueNames:Record<string,string>={inbox:'临时收件箱',batch:'集中处理',waiting:'交接与等待',low:'轻松一点',medium:'状态平稳',high:'精力充沛'};
 function describe(value:unknown):string{
  if(value===null)return '删除这条记录';

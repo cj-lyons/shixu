@@ -2,6 +2,11 @@ name: Desktop release
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - .github/workflows/desktop-release.yml
 
 permissions:
   contents: read
@@ -16,6 +21,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - os: windows-2025
+            platform: win
+            arch: x64
+            executable: desktop-release/win-unpacked/拾序.exe
           - os: ubuntu-24.04
             platform: linux
             arch: x64
@@ -48,6 +57,8 @@ jobs:
         run: |
           npm run check
           npm run test:platform
+          npm run test:reminders
+          npm run test:wellbeing
           npm run test:sync
       - name: Build clean desktop app
         run: npm run desktop:prepare
@@ -62,6 +73,9 @@ jobs:
         run: xvfb-run -a node tests/desktop-release-smoke.cjs '${{ matrix.executable }}'
       - name: Test packaged app on macOS
         if: runner.os == 'macOS'
+        run: node tests/desktop-release-smoke.cjs '${{ matrix.executable }}'
+      - name: Test packaged app on Windows
+        if: runner.os == 'Windows'
         run: node tests/desktop-release-smoke.cjs '${{ matrix.executable }}'
       - name: Upload diagnostic results
         if: always()
@@ -80,6 +94,7 @@ jobs:
             desktop-release/*.deb
             desktop-release/*.dmg
             desktop-release/*.zip
+            desktop-release/*.exe
           if-no-files-found: error
           retention-days: 7
   publish:
@@ -102,6 +117,12 @@ jobs:
         run: |
           set -euo pipefail
           VERSION=$(node -p "require('./package.json').version")
+          NOTES="docs/releases/v$VERSION.md"
+          test -f "$NOTES"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; keeping its published files unchanged."
+            exit 0
+          fi
           cd release-assets
           sha256sum Shixu-* > SHA256SUMS.txt
-          gh release create "v$VERSION" --prerelease --target "$GITHUB_SHA" --title "拾序 v$VERSION · Linux 与 macOS 体验版" --notes-file ../docs/releases/v1.8.2.md ./*
+          gh release create "v$VERSION" --prerelease --target "$GITHUB_SHA" --title "拾序 v$VERSION · 未来待办与花语休息提醒" --notes-file "../$NOTES" ./*

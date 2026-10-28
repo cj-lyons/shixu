@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu, dialog, session, shell, Tray, Notification, ipcMain, nativeImage, safeStorage } = require('electron');
+const { app, BrowserWindow, Menu, dialog, session, shell, Tray, Notification, ipcMain, nativeImage, safeStorage, powerMonitor, screen } = require('electron');
+const { createWellbeingCard } = require('./wellbeing-card.cjs');
 const { createReminders } = require('./reminders.cjs');
 const { createTrayControls } = require('./tray-controls.cjs');
 const { canStoreSecrets, runtimeIconFile } = require('./platform.cjs');
@@ -17,7 +18,7 @@ if (profileArg) app.setPath('userData', path.resolve(profileArg.slice('--shixu-p
 else app.setPath('userData', path.join(app.getPath('appData'), devMode ? 'ShixuDevelopment' : 'ShixuDesktop'));
 const portArg = process.argv.find(value => value.startsWith('--shixu-port='));
 const port = portArg ? Number(portArg.split('=')[1]) : devMode ? 18750 : 18736;
-let window, adminWindow, service, tray, reminders, trayControls, showWorkspace, quitting = false, closingService = false;
+let window, adminWindow, service, tray, reminders, trayControls, wellbeingCard, showWorkspace, quitting = false, closingService = false;
 const notifications = new Set();
 let musicState={ready:false,playing:false,title:'',id:null,automatic:true};
 const publishTimer=timer=>{if(window&&!window.isDestroyed())window.webContents.send('shixu:timer-updated',timer);trayControls?.refresh();};
@@ -66,9 +67,8 @@ else {
       void window.loadURL(service.url);
       };
       const audit = event => { if (profileArg) fs.appendFileSync(path.join(app.getPath('userData'), 'notification-proof.jsonl'), JSON.stringify({ ...event, at: Date.now() }) + '\n'); };
-      reminders = createReminders({ file: path.join(app.getPath('userData'), 'reminders.json'), getWorkspace: service.getWorkspace, supported: Notification.isSupported(),
-        onTimer: publishTimer,
-        notify: (message, report) => {
+      wellbeingCard=createWellbeingCard({BrowserWindow,screen,ipcMain,appearance:async()=>window&&!window.isDestroyed()?window.webContents.executeJavaScript('document.documentElement.dataset.theme || "sakura"'):'sakura',act:(key,action)=>reminders.wellbeing.act(key,action),onShown:key=>audit({key,phase:'card-shown'})});
+      const nativeNotify=(message,report)=>{
           const notification = new Notification({ title: message.title, body: message.body, icon: nativeImage.createFromPath(iconPath), silent: false });
           notifications.add(notification); audit({ ...message, phase: 'requested' });
           notification.on('show', () => { report('shown'); audit({ key: message.key, phase: 'shown' }); });
@@ -76,12 +76,30 @@ else {
           notification.on('close', () => notifications.delete(notification));
           notification.on('click', () => { notifications.delete(notification); showWorkspace(); });
           notification.show();
+      };
+      reminders = createReminders({ file: path.join(app.getPath('userData'), 'reminders.json'), getWorkspace: service.getWorkspace, supported: Notification.isSupported(),
+        onTimer: publishTimer,
+        getIdleSeconds:()=>powerMonitor.getSystemIdleTime(),
+        wellbeingAllowed:()=>powerMonitor.getSystemIdleState(300)!=='locked',
+        onWellbeing:state=>wellbeingCard.sync(state),
+        notify: (message, report) => {
+          if(message.floralCard&&message.wellbeingKeys?.length){void wellbeingCard.show(message).then(shown=>{if(shown)report('shown');}).catch(()=>nativeNotify(message,report));return;}
+          nativeNotify(message,report);
         }
       });
       const fromWorkspace = event => { if (!window || event.sender !== window.webContents || !trusted(event.senderFrame?.url || '')) throw Error('请求来源无效'); };
       ipcMain.handle('shixu:open-content-admin',event=>{fromWorkspace(event);showContentAdmin();return {opened:true};});
       ipcMain.handle('shixu:choose-music-directory', async event=>{fromWorkspace(event);const result=await dialog.showOpenDialog(window,{title:'选择本机音乐文件夹',properties:['openDirectory'],...(musicDirectory?{defaultPath:musicDirectory}:{})});if(result.canceled||!result.filePaths[0])return {canceled:true};const selected=fs.realpathSync(result.filePaths[0]);const temporary=libraryConfig+'.tmp';fs.writeFileSync(temporary,JSON.stringify({directory:selected}));fs.renameSync(temporary,libraryConfig);musicDirectory=selected;return {canceled:false};});
+      powerMonitor.on('resume',()=>reminders?.wellbeing.resume());
+      powerMonitor.on('unlock-screen',()=>reminders?.wellbeing.resume());
+      powerMonitor.on('lock-screen',()=>wellbeingCard.close());
+      powerMonitor.on('suspend',()=>wellbeingCard.close());
       ipcMain.handle('shixu:reminders-state', event => { fromWorkspace(event); return reminders.getState(); });
+      ipcMain.handle('shixu:wellbeing-state', event => { fromWorkspace(event); return reminders.wellbeing.getState(); });
+      ipcMain.handle('shixu:wellbeing-configure', (event,value) => { fromWorkspace(event); return reminders.wellbeing.configure(value); });
+      ipcMain.handle('shixu:wellbeing-act', (event,key,action) => { fromWorkspace(event); return reminders.wellbeing.act(key,action); });
+      ipcMain.handle('shixu:wellbeing-test', event => { fromWorkspace(event); return reminders.wellbeing.test(); });
+      ipcMain.handle('shixu:wellbeing-pause', (event,minutes) => { fromWorkspace(event); return reminders.wellbeing.pause(minutes); });
       ipcMain.handle('shixu:reminders-enable', event => { fromWorkspace(event); const result = reminders.enable(true); reminders.test();trayControls?.refresh(); return result; });
       ipcMain.handle('shixu:timer-sync', (event, timer) => { fromWorkspace(event); return reminders.syncTimer(timer); });
       ipcMain.handle('shixu:music-state',(event,value)=>{fromWorkspace(event);if(!value||typeof value.ready!=='boolean'||typeof value.playing!=='boolean'||typeof value.automatic!=='boolean'||typeof value.title!=='string'||value.title.length>160||(value.id!==null&&!musicCatalog.some(song=>song.id===value.id)))throw Error('音乐状态无效');musicState={ready:value.ready,playing:value.playing,automatic:value.automatic,title:value.title.replace(/[\r\n]/g,' '),id:value.id};trayControls?.refresh();});
@@ -110,6 +128,7 @@ else {
   app.on('window-all-closed', () => { /* The tray and reminder scheduler keep the app running. */ });
   app.on('before-quit', event => {
     quitting = true;
+    wellbeingCard?.close();
     if (service && !closingService) { event.preventDefault(); closingService = true; reminders?.close(); trayControls?.close();tray?.destroy(); service.close().finally(() => app.quit()); }
   });
 }

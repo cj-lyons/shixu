@@ -1,5 +1,5 @@
 import { z } from 'zod';
-export const DATA_FORMAT_VERSION=2;
+export const DATA_FORMAT_VERSION=3;
 export const taskSchema = z.object({
   id: z.string().min(1).max(100), title: z.string().trim().min(1).max(300),
   category: z.enum(['inbox','batch','waiting']), due: z.string().max(40),
@@ -8,6 +8,7 @@ export const taskSchema = z.object({
   done: z.boolean(), coreDate: z.string().max(10), created: z.string().max(40),
   lastProgress:z.string().max(500).optional(),resumeFrom:z.string().max(500).optional(),
   phaseUpdatedAt:z.string().datetime().optional(),
+  remindAt:z.union([z.literal(''),z.string().datetime()]).optional(),
   followUpAt:z.string().max(40).refine(value=>!value||Number.isFinite(Date.parse(value)),'跟进日期无效').optional(),interruptedSessionId:z.string().max(100).optional(),
 });
 export const dataSchema = z.object({

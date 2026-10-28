@@ -1,6 +1,6 @@
 {
   "name": "shixu-independent",
-  "version": "1.8.2",
+  "version": "1.11.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -14,7 +14,9 @@
     "test:sync": "node tests/webdav-sync.mjs",
     "desktop:package:linux": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --linux --x64",
     "desktop:package:mac": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --mac",
-    "test:platform": "node tests/platform.cjs"
+    "test:platform": "node tests/platform.cjs",
+    "test:reminders": "node tests/task-reminders.mjs",
+    "test:wellbeing": "node tests/wellbeing.cjs && node tests/wellbeing-card.cjs"
   },
   "dependencies": {
     "lucide-react": "1.31.0",

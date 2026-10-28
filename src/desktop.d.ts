@@ -6,6 +6,11 @@ interface Window {
     chooseMusicDirectory():Promise<{canceled:boolean}>;
     getReminderState(): Promise<{ enabled:boolean; supported:boolean; timer:DesktopTimer|null; lastNotification:{ status:string }|null }>;
     enableReminders(): Promise<{ enabled:boolean; supported:boolean }>;
+    getWellbeing?():Promise<import('./wellbeing-types').WellbeingState>;
+    configureWellbeing?(value:import('./wellbeing-types').WellbeingConfig):Promise<import('./wellbeing-types').WellbeingState>;
+    actWellbeing?(key:import('./wellbeing-types').WellbeingKey,action:'done'|'snooze'):Promise<import('./wellbeing-types').WellbeingState>;
+    testWellbeing?():Promise<import('./wellbeing-types').WellbeingState>;
+    pauseWellbeing?(minutes:0|30|60):Promise<import('./wellbeing-types').WellbeingState>;
     reportMusicState(state:{ready:boolean;playing:boolean;title:string;id:string|null;automatic:boolean}):Promise<void>;
     onMusicCommand(callback:(command:DesktopMusicCommand)=>void):()=>void;
     onReminderState(callback:(state:{enabled:boolean;supported:boolean})=>void):()=>void;

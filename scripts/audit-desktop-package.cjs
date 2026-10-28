@@ -16,10 +16,12 @@ if (archives.length !== 1) throw Error('Expected exactly one packaged app archiv
 const archive = archives[0], files = asar.listPackage(archive).map(p => p.replaceAll('\\', '/').replace(/^\//, ''));
 const blocked = files.filter(p => /\.(?:sqlite(?:-.*)?|db(?:-.*)?|mp3|wav|flac|m4a|aac|ogg|webm|pem|key|pfx|p12)$/i.test(p) || /(?:^|\/)(?:data|music|output|versions)\/|(?:^|\/)\.env(?:$|\.)/i.test(p));
 if (blocked.length) throw Error('Unexpected private/distribution files: ' + blocked.join(', '));
-for (const file of ['LICENSE', 'ASSET-LICENSE.md', 'platform.cjs', 'icon.png', 'main.cjs', 'server.mjs']) {
+for (const file of ['LICENSE', 'ASSET-LICENSE.md', 'platform.cjs', 'icon.png', 'main.cjs', 'server.mjs', 'wellbeing.cjs', 'wellbeing-card.cjs', 'wellbeing-card-preload.cjs', 'wellbeing-card.html', 'wellbeing-card.css', 'wellbeing-card-view.js']) {
   if (!files.includes(file)) throw Error('Missing packaged file: ' + file);
 }
 if (!asar.extractFile(archive, 'LICENSE').toString().includes('2026 CheJ')) throw Error('Copyright attribution mismatch');
 const pkg = JSON.parse(asar.extractFile(archive, 'package.json'));
 if (pkg.version !== require('../package.json').version) throw Error('Version mismatch');
+const resourceDir=path.dirname(archive);
+for(const file of ['private-guqin','private-music-manifest.json'])if(fs.existsSync(path.join(resourceDir,file)))throw Error('Private music resource included');
 console.log(JSON.stringify({ auditPassed: true, version: pkg.version, entries: files.length, bundledMusic: false }));
