@@ -12,6 +12,8 @@
   <a href="#下载与安装">下载体验版</a> ·
   <a href="#拾序可以做什么">功能介绍</a> ·
   <a href="#65-秒操作演示">操作演示</a> ·
+  <a href="#快速开始">快速开始</a> ·
+  <a href="#文档导航">文档导航</a> ·
   <a href="https://github.com/cj-lyons/shixu/issues/new/choose">反馈与建议</a> ·
   <a href="CONTRIBUTING.md">参与贡献</a>
 </p>
@@ -130,26 +132,100 @@ Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImag
 
 反馈、截图和提交请使用虚构示例，不要附带真实任务、数据库、同步凭据或私人歌曲。欢迎协助验证不同桌面环境中的托盘、提醒和同步体验。
 
-## 开发与部署
+## 技术栈
 
-使用 React、TypeScript、Electron 和 SQLite。需要 Node.js 24.12 或更新的 24.x 版本，以及 npm。Windows 为主要日常开发环境，Linux 与 macOS 已加入原生构建机验证。
+| 层次 | 技术与用途 |
+| --- | --- |
+| 界面 | React + TypeScript，任务工作台、花卉主题与音乐播放器 |
+| 桌面 | Electron，窗口、托盘、系统提醒与本机能力 |
+| 本机服务与存储 | Node.js + SQLite，任务保存、备份和内容管理 |
+| 数据校验 | Zod，校验任务与同步数据 |
+| 跨设备同步 | WebDAV，通过坚果云等服务交换任务与已保存的专注记录 |
+| 构建与打包 | Vite + electron-builder，生成桌面应用与安装包 |
 
-<details>
-<summary>从源码运行桌面开发版</summary>
+## 快速开始
 
-```powershell
+日常使用请直接[下载安装包](#下载与安装)。下面的步骤适合希望修改源码或参与贡献的开发者。
+
+### 环境要求
+
+- Git，用于克隆仓库。
+- Node.js **24.12 或更新的 24.x**，以及随附的 npm。
+- Windows 为主要日常开发环境；Linux 与 macOS 已加入原生构建机验证，桌面能力仍需在目标设备上检查。
+
+### 从源码运行桌面开发版
+
+```bash
+# 获取源码
+git clone https://github.com/cj-lyons/shixu.git
+cd shixu
+
+# 按锁文件安装依赖
 npm ci
+
+# 启动前检查
 npm run check
 npm run test:platform
 npm run test:sync
+
+# 构建并打开桌面开发版
 npm run desktop:dev
 ```
+
+启动命令会先构建界面，再打开独立的 Electron 桌面窗口。桌面版自动进入本机工作台，无需填写默认登录账号。
 
 开发版与日常版分别使用 ShixuDevelopment 和 ShixuDesktop 数据目录，互相独立：Windows 位于 AppData/Roaming，Mac 位于 ~/Library/Application Support，Linux 位于系统配置目录（通常为 ~/.config）。
 
 源码修改后重新运行开发启动命令会重新构建。Ctrl+R 只重新加载已构建的界面；原生菜单、提醒和后台修改需要完全退出后重开。
 
-</details>
+### 常用命令
+
+| 命令 | 用途 |
+| --- | --- |
+| `npm run desktop:dev` | 构建并打开桌面开发版 |
+| `npm run check` | 检查 TypeScript 类型 |
+| `npm run build` | 构建网页界面，不会自动启动服务 |
+| `npm run test:sync` | 测试模拟 WebDAV 同步，不连接个人云盘 |
+| `npm run desktop:package` | 在 Windows 构建 x64 桌面安装包 |
+| `npm run desktop:package:linux` | 在 Linux 构建 x64 桌面包 |
+| `npm run desktop:package:mac` | 在 macOS 构建桌面包 |
+
+打包请在对应平台执行。自行构建不会自动获得 Windows 签名或 Apple 公证。
+
+## 项目结构
+
+```text
+shixu/
+├── src/                    # React 工作台、任务、计时、花卉主题与播放器
+├── server/                 # 本机 HTTP 服务、SQLite 存储与 WebDAV 同步
+├── desktop/                # Electron 主进程、托盘、提醒与窗口
+├── scripts/                # 开发启动、主题/音乐资源准备及打包检查
+├── tests/                  # 同步、平台及提醒等回归检查
+├── public/                 # 网页静态资源
+├── docs/                   # 使用说明、更新说明和演示素材
+├── .github/                # 构建发布流程、Issue 与 PR 模板
+├── .env.example            # 独立网页服务的配置示例
+├── electron-builder.cjs     # 桌面打包配置
+├── package.json            # 依赖与运行命令
+├── CONTRIBUTING.md         # 贡献指南
+├── ASSET-LICENSE.md        # 素材与第三方授权范围
+└── LICENSE                 # MIT 许可证
+```
+
+## 文档导航
+
+| 想了解什么 | 入口 |
+| --- | --- |
+| 下载与首次使用 | [下载与安装](#下载与安装) · [第一次使用](#第一次使用) |
+| 本机保存、备份与坚果云同步 | [数据与同步](#数据与同步) |
+| 未来事项与提醒 | [未来提醒说明](docs/未来提醒说明.md) |
+| 活动、喝水与会议暂停 | [活动与喝水提醒](docs/活动与喝水提醒.md) |
+| 开发环境、反馈与提交 PR | [贡献指南](CONTRIBUTING.md) |
+| 历次功能变化 | [更新日志](CHANGELOG.md) · [版本发布记录](https://github.com/cj-lyons/shixu/releases) |
+| 发布前的数据与素材检查 | [公开前检查记录](docs/PUBLICATION-REVIEW.md) |
+| 开源许可与素材使用 | [MIT 许可证](LICENSE) · [素材授权说明](ASSET-LICENSE.md) |
+
+## 部署与资源说明
 
 <details>
 <summary>音乐文件与花卉配乐</summary>
