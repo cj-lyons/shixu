@@ -1,7 +1,9 @@
 import type { Task } from './model.ts';
 import { localDay } from './model.ts';
+import {currentProjectStep} from './project-steps.ts';
 
 export function isFutureTask(task:Task,day:string){
+  const follow=currentProjectStep(task)?.followUpAt;if(follow&&localDay(new Date(follow))<=day)return false;
   return !!task.remindAt&&localDay(new Date(task.remindAt))>day&&task.coreDate!==day&&!(task.due&&localDay(new Date(task.due))<=day);
 }
 export function taskInSection(task:Task,section:string,day:string){
@@ -10,7 +12,7 @@ export function taskInSection(task:Task,section:string,day:string){
   const future=isFutureTask(task,day);
   if(section==='reminders')return future;
   if(future)return false;
-  if(section==='today')return task.coreDate===day||!!task.due&&localDay(new Date(task.due))<=day||!!task.remindAt&&localDay(new Date(task.remindAt))<=day;
+  if(section==='today'){const follow=currentProjectStep(task)?.followUpAt;return task.coreDate===day||!!task.due&&localDay(new Date(task.due))<=day||!!task.remindAt&&localDay(new Date(task.remindAt))<=day||!!follow&&localDay(new Date(follow))<=day;}
   return task.category===section;
 }
 export function beforeDeadline(due:string,minutes:number){

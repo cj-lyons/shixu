@@ -9,6 +9,7 @@ desktop/*.zip
 desktop-release/
 output/
 desktop/dev-app/
+desktop/dev-runtime/
 
 # Private music library: rights unverified, never upload audio.
 music/养心曲/

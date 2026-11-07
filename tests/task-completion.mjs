@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {completeTask,reopenTaskRecord,compareCompletedTasks} from '../src/task-completion.ts';
+import {taskSchema} from '../src/model.ts';
+const task=(id,created,due='')=>({id,title:id,created,due,category:'inbox',owner:'',from:'',standard:'',estimate:25,energy:'medium',done:false,coreDate:''});
+const old=task('old','2026-10-01T01:00:00.000Z','2026-10-02T01:00:00.000Z'),recent=task('recent','2026-10-29T01:00:00.000Z','2026-11-01T01:00:00.000Z');
+const first=completeTask(recent,'2026-10-30T01:00:00.000Z'),last=completeTask(old,'2026-10-30T02:00:00.000Z');
+assert.deepEqual([first,last].sort(compareCompletedTasks).map(t=>t.id),['old','recent']);
+assert.equal(last.created,old.created);assert.equal(last.due,old.due);assert.equal(old.done,false);
+assert.equal(completeTask(last,'2026-11-01T01:00:00.000Z').completedAt,last.completedAt);
+const reopened=reopenTaskRecord(last);assert.equal(reopened.done,false);assert.equal('completedAt'in reopened,false);
+const again=completeTask(reopened,'2026-10-31T01:00:00.000Z');assert.equal(again.completedAt,'2026-10-31T01:00:00.000Z');
+const legacy=[{...old,done:true},{...recent,done:true}];assert.deepEqual(legacy.sort(compareCompletedTasks).map(t=>t.id),['recent','old']);assert.equal(legacy.every(t=>!t.completedAt),true);
+assert.deepEqual([...legacy,last].sort(compareCompletedTasks).map(t=>t.id),['old','recent','old']);
+assert.equal(taskSchema.parse(last).completedAt,last.completedAt);assert.equal(taskSchema.safeParse({...last,completedAt:'invalid'}).success,false);
+assert.throws(()=>completeTask({...old,project:{enabled:true,history:[],steps:[{id:'step',title:'待确认',owner:'',followUpAt:'',done:false}]}}),/先完成项目步骤/);
+console.log('Passed: completion time overrides due/creation order, duplicate completion preserves timestamp, reopening clears date, re-completion gets new date, historical fallback without invented dates, schema persistence and project guard.');

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>拾序开发版 · 玉兰白</title>
+  <defs>
+    <linearGradient id="ground" x2="0.9" y2="1"><stop stop-color="#8f9b8c"/><stop offset="1" stop-color="#6d7d71"/></linearGradient>
+    <linearGradient id="white" x1="0" y1="0" x2="0.6" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#e9eadf"/></linearGradient>
+    <path id="petal" d="M128 144C107 137 103 104 123 65Q128 57 133 66C152 105 150 135 128 144Z"/>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="58" fill="url(#ground)"/>
+  <path d="M128 142C136 166 133 183 113 213" fill="none" stroke="#cbd3bb" stroke-width="4" stroke-linecap="round"/>
+  <path d="M129 178C145 159 165 160 176 157C173 179 153 190 129 178ZM120 198C101 178 81 183 78 181C83 204 101 211 120 198Z" fill="#bdcbb4"/>
+  <g fill="url(#white)" stroke="#d6d9c9" stroke-width="1.3" stroke-linejoin="round">
+    <use href="#petal" transform="rotate(-80 128 132)"/><use href="#petal" transform="rotate(80 128 132)"/>
+    <use href="#petal" transform="rotate(-55 128 132)"/><use href="#petal" transform="rotate(55 128 132)"/>
+    <use href="#petal" transform="rotate(-30 128 132)"/><use href="#petal" transform="rotate(30 128 132)"/>
+    <use href="#petal"/><use href="#petal" transform="rotate(-110 128 132) scale(0.76) translate(40.4 41.7)"/><use href="#petal" transform="rotate(110 128 132) scale(0.76) translate(40.4 41.7)"/>
+  </g>
+  <ellipse cx="128" cy="133" rx="8" ry="14" fill="#d2bd7a"/>
+  <path d="M125 125L130 129M124 131L131 135M125 138L129 140" stroke="#f2e5ad" stroke-width="2" stroke-linecap="round"/>
+</svg>

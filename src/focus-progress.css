@@ -1,0 +1,6 @@
+.tomato-dots.focus-cycle{flex-wrap:wrap;gap:9px}
+.focus-cycle .focus-dot{display:block;flex:none;width:10px;height:10px;border-radius:50%;background:var(--tint-strong);position:relative;overflow:hidden}
+.focus-cycle .focus-dot::after{content:'';position:absolute;inset:0;background:var(--green);transform:translateY(calc((1 - var(--segment-progress,0))*100%));transition:transform .4s linear}
+.focus-cycle .focus-dot.active{outline:1px solid var(--green);outline-offset:3px}
+.focus-cycle small{flex-basis:100%;margin:3px 0 0;text-align:center;line-height:1.7}
+@media(prefers-reduced-motion:reduce){.focus-cycle .focus-dot::after{transition:none}}

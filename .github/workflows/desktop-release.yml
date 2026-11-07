@@ -59,6 +59,10 @@ jobs:
           npm run test:platform
           npm run test:reminders
           npm run test:wellbeing
+          npm run test:custom-reminders
+          npm run test:projects
+          npm run test:completion
+          npm run test:focus-progress
           npm run test:sync
       - name: Build clean desktop app
         run: npm run desktop:prepare
@@ -110,7 +114,7 @@ jobs:
           pattern: packages-*
           path: release-assets
           merge-multiple: true
-      - name: Checksum and publish preview
+      - name: Checksum and publish release
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -125,4 +129,4 @@ jobs:
           fi
           cd release-assets
           sha256sum Shixu-* > SHA256SUMS.txt
-          gh release create "v$VERSION" --prerelease --target "$GITHUB_SHA" --title "拾序 v$VERSION · 未来待办与花语休息提醒" --notes-file "../$NOTES" ./*
+          gh release create "v$VERSION" --latest --target "$GITHUB_SHA" --title "拾序 v$VERSION · 一键专注与自定义提醒" --notes-file "../$NOTES" ./*

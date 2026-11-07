@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Cloud, RefreshCw, X } from 'lucide-react';
 import './sync-control.css';
+import {describeProject} from './project-steps';
 
 type Version={clock:Record<string,number>;value:unknown};
 type SyncStatus={available:boolean;configured:boolean;running:boolean;pending:boolean;lastAt:string|null;error:string;folder:string;account:string;conflicts:{key:string;versions:Version[]}[]};
 type Preview={previewToken:string;devices:number;localTasks:number;remoteTasks:number;conflicts:number};
-const fieldNames:Record<string,string>={remindAt:'提醒时间',goal:'本段目标',progress:'本段进展',resumeFrom:'继续位置',lastProgress:'已推进到',followUpAt:'计划跟进',phaseUpdatedAt:'进展更新时间',endedAt:'专注结束时间',interruptedSessionId:'打扰关联',title:'内容',category:'清单',due:'截止时间',owner:'负责人',from:'交办人',standard:'完成标准',estimate:'预计分钟',energy:'精力',done:'完成状态',created:'创建时间',taskId:'事项编号',minutes:'专注分钟',date:'日期'};
+const fieldNames:Record<string,string>={completedAt:'完成时间',remindAt:'提醒时间',goal:'本段目标',progress:'本段进展',resumeFrom:'继续位置',lastProgress:'已推进到',followUpAt:'计划跟进',phaseUpdatedAt:'进展更新时间',endedAt:'专注结束时间',interruptedSessionId:'打扰关联',title:'内容',category:'清单',due:'截止时间',owner:'负责人',from:'交办人',standard:'完成标准',estimate:'预计分钟',energy:'精力',done:'完成状态',created:'创建时间',taskId:'事项编号',minutes:'专注分钟',date:'日期'};
 const valueNames:Record<string,string>={inbox:'临时收件箱',batch:'集中处理',waiting:'交接与等待',low:'轻松一点',medium:'状态平稳',high:'精力充沛'};
 function describe(value:unknown):string{
  if(value===null)return '删除这条记录';
- if(value&&typeof value==='object')return Object.entries(value).filter(([key])=>key!=='id'&&key!=='coreDate').map(([key,v])=>`${fieldNames[key]||key}：${typeof v==='boolean'?(v?'已完成':'未完成'):valueNames[String(v)]||String(v||'未填写')}`).join('\n');
+ if(value&&typeof value==='object')return Object.entries(value).filter(([key])=>key!=='id'&&key!=='coreDate').map(([key,v])=>`${key==='project'?'项目跟进':fieldNames[key]||key}：${key==='project'?describeProject(v):typeof v==='boolean'?(v?'已完成':'未完成'):valueNames[String(v)]||String(v||'未填写')}`).join('\n');
  return valueNames[String(value)]||String(value);
 }
 async function api<T>(route:string,body?:unknown):Promise<T>{const response=await fetch('/api/sync'+route,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});const result=await response.json();if(!response.ok)throw Error(result.error||'同步服务暂不可用');return result;}

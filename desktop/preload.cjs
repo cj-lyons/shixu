@@ -1,5 +1,10 @@
 const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('shixuDesktop', {
+  getCustomReminders:()=>ipcRenderer.invoke('shixu:custom-state'),
+  saveCustomReminder:value=>ipcRenderer.invoke('shixu:custom-save',value),
+  toggleCustomReminder:id=>ipcRenderer.invoke('shixu:custom-toggle',id),
+  removeCustomReminder:id=>ipcRenderer.invoke('shixu:custom-remove',id),
+  actCustomReminder:(key,action)=>ipcRenderer.invoke('shixu:custom-act',key,action),
   openContentAdmin:()=>ipcRenderer.invoke('shixu:open-content-admin'),
   chooseMusicDirectory: ()=>ipcRenderer.invoke('shixu:choose-music-directory'),
   getReminderState: () => ipcRenderer.invoke('shixu:reminders-state'),

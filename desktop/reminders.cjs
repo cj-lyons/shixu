@@ -29,6 +29,8 @@ function createReminders({ file, getWorkspace, notify, onTimer, onWellbeing = ()
     const date = new Date(current), day = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
     const hhmm = `${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
     const active = workspace.tasks.filter(task => !task.done);
+    const followups=active.flatMap(task=>{const step=task.project?.enabled?task.project.steps.find(s=>!s.done):null;return step?.followUpAt&&Date.parse(step.followUpAt)<=current?[{key:'project-follow:'+task.id+':'+step.id+':'+step.followUpAt,title:task.title+' · '+step.title}]:[];}).filter(item=>!state.sent.includes(item.key));
+    if(followups.length){send(followups[0].key,'拾序 · 项目跟进',followups.slice(0,3).map(item=>'「'+item.title.slice(0,75)+'」').join('、')+'到了跟进时间，有空时查看下一步。');state.sent=[...new Set([...state.sent,...followups.map(item=>item.key)])].slice(-10000);save();}
     const planned = active.filter(task => task.remindAt && Number.isFinite(Date.parse(task.remindAt)) && Date.parse(task.remindAt) <= current && !state.sent.includes('planned:' + task.id + ':' + task.remindAt)).sort((a,b)=>Date.parse(a.remindAt)-Date.parse(b.remindAt));
     if (planned.length) {
       const keys = planned.map(task => 'planned:' + task.id + ':' + task.remindAt);

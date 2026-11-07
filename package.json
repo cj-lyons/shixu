@@ -1,6 +1,6 @@
 {
   "name": "shixu-independent",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,24 +16,28 @@
     "desktop:package:mac": "npm run desktop:prepare && electron-builder --config electron-builder.cjs --mac",
     "test:platform": "node tests/platform.cjs",
     "test:reminders": "node tests/task-reminders.mjs",
-    "test:wellbeing": "node tests/wellbeing.cjs && node tests/wellbeing-card.cjs"
+    "test:custom-reminders": "node tests/custom-reminders.cjs",
+    "test:wellbeing": "node tests/wellbeing.cjs && node tests/wellbeing-card.cjs",
+    "test:projects": "node tests/project-steps.mjs",
+    "test:completion": "node tests/task-completion.mjs",
+    "test:focus-progress": "node tests/focus-progress.mjs"
   },
   "dependencies": {
     "lucide-react": "1.31.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "zod": "3.25.76"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "electron": "44.5.1",
+    "electron": "44.10.2",
     "electron-builder": "26.15.3",
     "esbuild": "0.28.2",
     "typescript": "5.9.3",
-    "vite": "8.0.13"
+    "vite": "8.3.6"
   },
   "license": "MIT"
 }

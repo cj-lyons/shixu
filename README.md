@@ -9,7 +9,7 @@
 <p align="center">记下任务，专注一段，也允许自己安心休息。<br />用四季花语和本机音乐，为工作台留一点温度。</p>
 
 <p align="center">
-  <a href="#下载与安装">下载体验版</a> ·
+  <a href="#下载与安装">下载桌面版</a> ·
   <a href="#拾序可以做什么">功能介绍</a> ·
   <a href="#65-秒操作演示">操作演示</a> ·
   <a href="#快速开始">快速开始</a> ·
@@ -30,17 +30,17 @@
 
 | 系统 | 推荐下载 | 其他选择 |
 | --- | --- | --- |
-| **Windows x64** | [安装版 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-x64-Setup.exe) | [免安装版](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-x64-Portable.exe) |
-| **macOS · 苹果芯片 M 系列** | [DMG · arm64 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-arm64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-arm64.zip) |
-| **macOS · Intel** | [DMG · x64 · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-x64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-mac-x64.zip) |
-| **Ubuntu / Debian x64** | [deb · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-amd64.deb) | [AppImage](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-x86_64.AppImage) |
-| **其他 Linux x64** | [AppImage · v1.11.0](https://github.com/cj-lyons/shixu/releases/download/v1.11.0/Shixu-1.11.0-linux-x86_64.AppImage) | 需系统支持 FUSE |
+| **Windows x64** | [安装版 · v1.12.0](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-x64-Setup.exe) | [免安装版](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-x64-Portable.exe) |
+| **macOS · 苹果芯片 M 系列** | [DMG · arm64 · v1.12.0](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-mac-arm64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-mac-arm64.zip) |
+| **macOS · Intel** | [DMG · x64 · v1.12.0](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-mac-x64.dmg) | [ZIP](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-mac-x64.zip) |
+| **Ubuntu / Debian x64** | [deb · v1.12.0](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-linux-amd64.deb) | [AppImage](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-linux-x86_64.AppImage) |
+| **其他 Linux x64** | [AppImage · v1.12.0](https://github.com/cj-lyons/shixu/releases/download/v1.12.0/Shixu-1.12.0-linux-x86_64.AppImage) | 需系统支持 FUSE |
 
 Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImage 需先授予执行权限。各平台安装包不附带个人任务、账号配置或歌曲文件。
 
 > **体验版说明**：当前未提供开发者证书签名，Mac 尚未 Apple 公证，系统可能阻止打开。本版按平台构建，并通过打包应用的启动、任务保存、计时、主题及重启测试后发布；不等于所有用户桌面、系统通知和真实云同步均已验证。
 >
-> 完整文件、校验值和已知限制：[v1.11.0 下载与更新说明](https://github.com/cj-lyons/shixu/releases/tag/v1.11.0)
+> 完整文件、校验值和已知限制：[v1.12.0 下载与更新说明](https://github.com/cj-lyons/shixu/releases/tag/v1.12.0)
 
 ## 拾序可以做什么
 
@@ -62,7 +62,11 @@ Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImag
 
 ### 5. 办公室和家里，继续同一份任务
 
-桌面端可通过坚果云 WebDAV 同步任务和已保存的专注记录，保留冲突供你处理。修改先存本机；音乐文件、运行中的计时和花笺寄语暂不参与同步。
+桌面端可通过坚果云 WebDAV 同步任务和已保存的专注记录，保留冲突供你处理。修改先存本机；音乐文件、运行中的计时、花笺寄语和自定义提醒暂不参与同步。
+
+### 6. 给生活里的小事设个提醒
+
+在首页“小小提醒”添加自定义内容，支持一次性、每天、工作日、每周，到点出现花语卡片，可已处理或稍后10分钟。提醒仅保存在当前电脑；错过的留为待确认。较长的工作可选择“作为项目跟进”，用简短的步骤继续推进。
 
 ## 更多花色
 
@@ -101,6 +105,8 @@ Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImag
 
 录屏使用独立的虚构示例数据。专注到期采用加速计时并标注，展示页面内提醒与开始休息，不是 Windows 系统通知弹窗。视频中的自创配乐经作者授权用于本演示，歌曲原文件不进入仓库，也不随安装包提供。
 
+想帮助改进拾序？欢迎参加[三天小范围试用](docs/三天试用.md)，只需反馈哪里卡住、用了什么、第二天有没有再打开。
+
 ## 第一次使用
 
 1. **记一件事**：先存进临时收件箱，不必马上安排所有细节。
@@ -111,13 +117,15 @@ Windows 按安装向导操作；Mac 将应用拖入 Applications；Linux AppImag
 
 ## 数据与同步
 
+升级本版后，任务与云端数据使用格式4，两台同步电脑请同时升级。旧客户端不能直接打开或覆盖新版数据，更新前请先备份。
+
 个人任务保存在本机 SQLite 数据库。通过软件 **数据 → 备份数据** 生成一致性备份，不要直接复制运行中的 SQLite 主文件。GitHub 只管理代码，不能替代个人任务的同步或备份。
 
 坚果云使用第三方应用密码，在软件内填写。两台桌面客户端使用相同账号和同步目录：修改后约 30 秒同步，每 10 分钟定时检查，也可立即同步；程序完全退出后不会自动同步。Linux 保存应用密码需要可用的系统密钥环。
 
 | 参与同步 | 留在本机 |
 | --- | --- |
-| 任务、完成状态、交接信息、已保存的专注记录 | 正在运行的计时、音乐文件、播放状态与音量、花笺寄语 |
+| 任务、完成状态、交接信息、已保存的专注记录 | 正在运行的计时、音乐文件、播放状态与音量、花笺寄语、自定义提醒 |
 
 > 项目仍在持续迭代。曾发生本机数据库及索引异常，已进行数据恢复和重启检查，完整诱因尚未确定。请保留独立备份，不将其作为关键事务的唯一记录；模拟 WebDAV 测试也不等于两台物理电脑的真实同步验收。
 
@@ -219,6 +227,8 @@ shixu/
 | 下载与首次使用 | [下载与安装](#下载与安装) · [第一次使用](#第一次使用) |
 | 本机保存、备份与坚果云同步 | [数据与同步](#数据与同步) |
 | 未来事项与提醒 | [未来提醒说明](docs/未来提醒说明.md) |
+| 自定义提醒与项目步骤 | [自定义提醒](docs/自定义提醒.md) · [简版项目跟进](docs/简版项目跟进.md) |
+| 三天试用与反馈 | [试用说明与反馈模板](docs/三天试用.md) |
 | 活动、喝水与会议暂停 | [活动与喝水提醒](docs/活动与喝水提醒.md) |
 | 开发环境、反馈与提交 PR | [贡献指南](CONTRIBUTING.md) |
 | 历次功能变化 | [更新日志](CHANGELOG.md) · [版本发布记录](https://github.com/cj-lyons/shixu/releases) |

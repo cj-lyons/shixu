@@ -2,6 +2,11 @@ type DesktopMusicCommand={type:'toggle'}|{type:'select';id:string}|{type:'automa
 type DesktopTimer = { id:string; goal?:string; prepared?:boolean; mode:'focus'|'short'|'long'; duration:number; remaining:number; end:number|null; finishedAt?:number; taskId:string; title:string; finished:boolean };
 interface Window {
   shixuDesktop?: {
+    getCustomReminders?():Promise<import('./custom-reminders').CustomReminderState>;
+    saveCustomReminder?(value:{id?:string;title:string;at:string;repeat:import('./custom-reminders').CustomReminder['repeat']}):Promise<import('./custom-reminders').CustomReminderState>;
+    toggleCustomReminder?(id:string):Promise<import('./custom-reminders').CustomReminderState>;
+    removeCustomReminder?(id:string):Promise<import('./custom-reminders').CustomReminderState>;
+    actCustomReminder?(key:string,action:'done'|'snooze'):Promise<import('./custom-reminders').CustomReminderState>;
     openContentAdmin():Promise<{opened:boolean}>;
     chooseMusicDirectory():Promise<{canceled:boolean}>;
     getReminderState(): Promise<{ enabled:boolean; supported:boolean; timer:DesktopTimer|null; lastNotification:{ status:string }|null }>;
